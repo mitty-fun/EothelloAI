@@ -10,6 +10,7 @@
         body {
             text-align: center;
             background-color: #ffc859;
+            font-family: monospace;
         }
         .grid {
             display: inline-block;
@@ -50,15 +51,17 @@
 <body>
     <div id="game">
         <div class="grid">
-            <div v-for="y in 8" class="row">
-                <div v-for="x in 8" class="col" :class="getClassOf(x, y)" @click="place(x, y)">
+            <div v-for="(_, y) in 8" class="row">
+                <div v-for="(_, x) in 8" class="col" :class="getClassOf(x, y)" @click="place(x, y)">
                 </div>
             </div>
         </div>
+        <p>{{gameInfo}}</p>
     </div>
-    <script src="eothello.js"></script>
+    <script src="othello.js"></script>
+    <script src="ai.js"></script>
     <script>
-        const game = new Eothello()
+        const game = new Othello()
         
         new Vue({
             el: '#game',
@@ -70,7 +73,23 @@
                     if (s === 'w') return ['white']
                 },
                 place(x, y) {
-                    this.game.place(x, y)
+                    if (this.game.place(x, y)) {
+                        setTimeout(()=>AI(game), 200)
+                    }
+                },
+                
+            },
+            computed: {
+                gameInfo() {
+                    let w = 0
+                    let b = 0
+                    for (let y = 0; y < 8; y++) {
+                        for (let x = 0; x < 8; x++) {
+                            if (this.game.grid[y][x] === 'w') w++
+                            if (this.game.grid[y][x] === 'b') b++
+                        }
+                    }
+                    return `${b} : ${w}`
                 }
             }
         })
