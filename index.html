@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style>
+        body {
+            text-align: center;
+            background-color: #ffc859;
+        }
+        .grid {
+            display: inline-block;
+            border: 1px solid black;
+        }
+        .row {
+            display: flex;
+        }
+        .col {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            line-height: 50px;
+            box-sizing: border-box;
+            border: 1px solid black;
+        }
+        .col.black::after,
+        .col.white::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 35px;
+            height: 35px;
+            border: 1px solid black;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .col.black::after {
+            background-color: black;
+        }
+        .col.white::after {
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="game">
+        <div class="grid">
+            <div v-for="y in 8" class="row">
+                <div v-for="x in 8" class="col" :class="getClassOf(x, y)" @click="place(x, y)">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="eothello.js"></script>
+    <script>
+        const game = new Eothello()
+        
+        new Vue({
+            el: '#game',
+            data: { game },
+            methods: {
+                getClassOf(x, y) {
+                    const s = this.game.grid[y][x]
+                    if (s === 'b') return ['black']
+                    if (s === 'w') return ['white']
+                },
+                place(x, y) {
+                    this.game.place(x, y)
+                }
+            }
+        })
+    </script>
+</body>
+</html>
