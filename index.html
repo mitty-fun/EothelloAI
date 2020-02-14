@@ -6,47 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <style>
-        body {
-            text-align: center;
-            background-color: #ffc859;
-            font-family: monospace;
-        }
-        .grid {
-            display: inline-block;
-            border: 1px solid black;
-        }
-        .row {
-            display: flex;
-        }
-        .col {
-            position: relative;
-            width: 50px;
-            height: 50px;
-            text-align: center;
-            line-height: 50px;
-            box-sizing: border-box;
-            border: 1px solid black;
-        }
-        .col.black::after,
-        .col.white::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 35px;
-            height: 35px;
-            border: 1px solid black;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-        }
-        .col.black::after {
-            background-color: black;
-        }
-        .col.white::after {
-            background-color: white;
-        }
-    </style>
+    <link rel="stylesheet" href="index.css">
 </head>
 <body>
     <div id="game">
@@ -65,19 +25,42 @@
         
         new Vue({
             el: '#game',
-            data: { game },
+            data: {
+                game,
+                validPos: game.getValidPos(),
+            },
             methods: {
                 getClassOf(x, y) {
                     const s = this.game.grid[y][x]
+                    if (this.validPos.some(pos => pos.x === x && pos.y === y)) return ['hint']
                     if (s === 'b') return ['black']
                     if (s === 'w') return ['white']
                 },
                 place(x, y) {
                     if (this.game.place(x, y)) {
-                        setTimeout(()=>AI(game), 200)
+                        this.validPos = this.game.getValidPos()
+                        if (this.validPos.length === 0) {
+                            this.game.switch()
+                        } else {
+                            this.runAI()
+                        }
                     }
                 },
-                
+                runAI() {
+                    setTimeout(() => {
+                        this.validPos = this.game.getValidPos()
+                        if (this.validPos.length === 0) return
+
+                        const result = AI(this.game)
+                        game.place(result.x, result.y)
+
+                        this.validPos = this.game.getValidPos()
+                        if (this.validPos.length === 0) {
+                            this.game.switch()
+                            this.runAI()
+                        }
+                    }, 1000)
+                }
             },
             computed: {
                 gameInfo() {

@@ -25,6 +25,19 @@ class Othello {
         this.grid[3][4] = 'w'
     }
 
+    getValidPos() {
+        const arr = []
+        for (let x = 0; x < 8; x++) {
+            for (let y = 0; y < 8; y++) {
+                if (this.place(x, y)) {
+                    arr.push({ x, y })
+                    this.undo()
+                }
+            }
+        }
+        return arr
+    }
+
     place(x, y) {
         if (this.grid[y][x] !== '') return false
 
@@ -37,7 +50,7 @@ class Othello {
         if (isValid) {
             this.logs.unshift({ x, y, status: this.grid[y][x], steps: this.steps })
             this.grid[y][x] = this.turn
-            this.turn = this.turn === 'b' ? 'w' : 'b'
+            this.switch()
             this.steps++
         }
 
@@ -45,7 +58,7 @@ class Othello {
     }
 
     fillLine(x, y, vx, vy) {
-        
+
         while (true) {
             x += vx
             y += vy
@@ -54,7 +67,7 @@ class Othello {
             if (target === this.turn) break
         }
 
-        while(true) {
+        while (true) {
             x -= vx
             y -= vy
             const target = this.grid[y][x]
@@ -67,14 +80,18 @@ class Othello {
         }
     }
 
+    switch() {
+        this.turn = this.turn === 'b' ? 'w' : 'b'
+    }
+
     undo() {
         if (this.steps > 0) {
             this.steps--
-            while(this.logs[0] && this.logs[0].steps === this.steps) {
+            while (this.logs[0] && this.logs[0].steps === this.steps) {
                 const diff = this.logs.shift()
                 this.grid[diff.y][diff.x] = diff.status
             }
-            this.turn = this.turn === 'b' ? 'w' : 'b'
+            this.switch()
         }
     }
 

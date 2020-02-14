@@ -1,8 +1,8 @@
 function AI(game) {
     const startTime = Date.now()
     const result = alphabeta(game.clone(), 4)
-    game.place(result.x, result.y)
     console.log(`cost: ${Date.now() - startTime}ms`)
+    return result
 }
 
 function alphabeta(game, deep, alpha = -Infinity, beta = Infinity) {
