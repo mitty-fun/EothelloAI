@@ -50,6 +50,7 @@ function evaluation(grid) {
             let i = 1
             if (x === 0 || x === 7) i *= 10
             if (y === 0 || y === 7) i *= 10
+            if (x === 1 || y === 1 || x === 6 || y === 6) i *= -1
             if (grid[y][x] === 'b') score += i
             if (grid[y][x] === 'w') score -= i
         }
