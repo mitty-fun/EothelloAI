@@ -17,6 +17,7 @@
             </div>
         </div>
         <p>{{ scores.black }} : {{ scores.white }}<br>{{ status }}</p>
+        <input type="checkbox" v-model="enableAI"/> enable AI
         <select v-model="level">
             <option v-for="i in 6" :value="i" :key="i">level {{ i }}</option>
         </select>
@@ -34,9 +35,8 @@
             data: {
                 game,
                 validPos: game.getValidPos(),
-                placeX: undefined,
-                placeY: undefined,
                 level: 4,
+                enableAI: true,
             },
             methods: {
                 getClassOf(x, y) {
@@ -45,19 +45,19 @@
                     if (this.validPos.some(pos => pos.x === x && pos.y === y)) return 'hint'
                     if (s === 'b') arr.push('black')
                     if (s === 'w') arr.push('white')
-                    if (x == this.placeX && y == this.placeY) arr.push('active')
+                    if (x == this.active.x && y == this.active.y) arr.push('active')
                     return arr
                 },
 
                 place(x, y) {
                     if (this.game.place(x, y)) {
-                        this.placeX = x
-                        this.placeY = y
                         this.validPos = this.game.getValidPos()
                         if (this.validPos.length === 0) {
                             this.game.switch()
                         } else {
-                            setTimeout(this.runAI, 2000)
+                            if (this.enableAI) {
+                                setTimeout(this.runAI, 2000)
+                            }
                         }
                     }
                 },
@@ -65,11 +65,7 @@
                 runAI() {
                     this.validPos = this.game.getValidPos()
                     if (this.validPos.length === 0) return this.game.switch()
-                    const result = AI(this.game, this.level)
-                    this.placeX = result.x
-                    this.placeY = result.y
-                    game.place(result.x, result.y)
-
+                    AI(this.game, this.level)
                     this.validPos = this.game.getValidPos()
                     if (this.validPos.length === 0) {
                         this.game.switch()
@@ -110,6 +106,11 @@
                         if (black === white) return 'tie'
                         return black > white ? 'black win' : 'white win'
                     }
+                },
+
+                active () {
+                    const logs = this.game.logs
+                    return logs.length > 0 ? logs[0] : {}
                 }
             }
         })

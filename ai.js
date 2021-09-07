@@ -2,7 +2,7 @@ function AI(game, depth) {
     const startTime = Date.now()
     const result = alphabeta(game.clone(), depth)
     console.log(`depth: ${depth} cost: ${Date.now() - startTime}ms`)
-    return result
+    game.place(result.x, result.y)
 }
 
 function alphabeta(game, depth, alpha = -Infinity, beta = Infinity) {
