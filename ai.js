@@ -40,6 +40,10 @@ function alphabeta(game, deep, alpha = -Infinity, beta = Infinity) {
         }
     }
 
+    if (best.x === undefined) {
+        best.score = evaluation(game.grid)
+    }
+
     return best
 }
 
