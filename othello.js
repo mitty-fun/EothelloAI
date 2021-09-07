@@ -12,6 +12,13 @@ class Othello {
         this.initGrid()
     }
 
+    reset() {
+        this.turn = 'b'
+        this.logs = []
+        this.steps = 0
+        this.initGrid()
+    }
+
     initGrid() {
         for (let y = -2; y < 10; y++) {
             this.grid[y] = {}

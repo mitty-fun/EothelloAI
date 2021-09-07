@@ -17,8 +17,12 @@
             </div>
         </div>
         <p>{{ scores.black }} : {{ scores.white }}<br>{{ status }}</p>
+        <select v-model="level">
+            <option v-for="i in 6" :value="i" :key="i">level {{ i }}</option>
+        </select>
         <button @click="runAI">run AI</button>
         <button @click="undo">undo</button>
+        <button @click="restart">restart</button>
     </div>
     <script src="othello.js"></script>
     <script src="ai.js"></script>
@@ -32,6 +36,7 @@
                 validPos: game.getValidPos(),
                 placeX: undefined,
                 placeY: undefined,
+                level: 4,
             },
             methods: {
                 getClassOf(x, y) {
@@ -60,7 +65,7 @@
                 runAI() {
                     this.validPos = this.game.getValidPos()
                     if (this.validPos.length === 0) return this.game.switch()
-                    const result = AI(this.game)
+                    const result = AI(this.game, this.level)
                     this.placeX = result.x
                     this.placeY = result.y
                     game.place(result.x, result.y)
@@ -75,6 +80,11 @@
                 undo() {
                     this.game.undo() // undo ai steps
                     this.game.undo() // undo my steps
+                    this.validPos = this.game.getValidPos()
+                },
+
+                restart () {
+                    this.game.reset()
                     this.validPos = this.game.getValidPos()
                 }
             },

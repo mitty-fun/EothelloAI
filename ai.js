@@ -1,11 +1,11 @@
-function AI(game) {
+function AI(game, depth) {
     const startTime = Date.now()
-    const result = alphabeta(game.clone(), 4)
-    console.log(`cost: ${Date.now() - startTime}ms`)
+    const result = alphabeta(game.clone(), depth)
+    console.log(`depth: ${depth} cost: ${Date.now() - startTime}ms`)
     return result
 }
 
-function alphabeta(game, deep, alpha = -Infinity, beta = Infinity) {
+function alphabeta(game, depth, alpha = -Infinity, beta = Infinity) {
 
     let best = {
         x: undefined,
@@ -17,7 +17,7 @@ function alphabeta(game, deep, alpha = -Infinity, beta = Infinity) {
         for (let y = 0; y < 8; y++) {
             if (game.place(x, y)) {
 
-                let result = deep > 0 ? alphabeta(game, deep - 1, alpha, beta) : (
+                let result = depth > 0 ? alphabeta(game, depth - 1, alpha, beta) : (
                     { x, y, score: evaluation(game.grid) }
                 )
 
