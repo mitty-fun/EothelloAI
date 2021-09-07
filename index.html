@@ -16,66 +16,94 @@
                 </div>
             </div>
         </div>
-        <p>{{gameInfo}}</p>
+        <p>{{ scores.black }} : {{ scores.white }}<br>{{ status }}</p>
+        <button @click="runAI">run AI</button>
+        <button @click="undo">undo</button>
     </div>
     <script src="othello.js"></script>
     <script src="ai.js"></script>
     <script>
         const game = new Othello()
-        
+
         new Vue({
             el: '#game',
             data: {
                 game,
                 validPos: game.getValidPos(),
+                placeX: undefined,
+                placeY: undefined,
             },
             methods: {
                 getClassOf(x, y) {
                     const s = this.game.grid[y][x]
-                    if (this.validPos.some(pos => pos.x === x && pos.y === y)) return ['hint']
-                    if (s === 'b') return ['black']
-                    if (s === 'w') return ['white']
+                    const arr = []
+                    if (this.validPos.some(pos => pos.x === x && pos.y === y)) return 'hint'
+                    if (s === 'b') arr.push('black')
+                    if (s === 'w') arr.push('white')
+                    if (x == this.placeX && y == this.placeY) arr.push('active')
+                    return arr
                 },
+
                 place(x, y) {
                     if (this.game.place(x, y)) {
+                        this.placeX = x
+                        this.placeY = y
                         this.validPos = this.game.getValidPos()
                         if (this.validPos.length === 0) {
                             this.game.switch()
                         } else {
-                            this.runAI()
+                            setTimeout(this.runAI, 2000)
                         }
                     }
                 },
+
                 runAI() {
-                    setTimeout(() => {
-                        this.validPos = this.game.getValidPos()
-                        if (this.validPos.length === 0) return
+                    this.validPos = this.game.getValidPos()
+                    if (this.validPos.length === 0) return this.game.switch()
+                    const result = AI(this.game)
+                    this.placeX = result.x
+                    this.placeY = result.y
+                    game.place(result.x, result.y)
 
-                        const result = AI(this.game)
-                        game.place(result.x, result.y)
+                    this.validPos = this.game.getValidPos()
+                    if (this.validPos.length === 0) {
+                        this.game.switch()
+                        this.runAI()
+                    }
+                },
 
-                        this.validPos = this.game.getValidPos()
-                        if (this.validPos.length === 0) {
-                            this.game.switch()
-                            this.runAI()
-                        }
-                    }, 1000)
+                undo() {
+                    this.game.undo() // undo ai steps
+                    this.game.undo() // undo my steps
+                    this.validPos = this.game.getValidPos()
                 }
             },
+
             computed: {
-                gameInfo() {
-                    let w = 0
-                    let b = 0
+                scores() {
+                    let black = 0
+                    let white = 0
                     for (let y = 0; y < 8; y++) {
                         for (let x = 0; x < 8; x++) {
-                            if (this.game.grid[y][x] === 'w') w++
-                            if (this.game.grid[y][x] === 'b') b++
+                            if (this.game.grid[y][x] === 'b') black++
+                            if (this.game.grid[y][x] === 'w') white++
                         }
                     }
-                    return `${b} : ${w}`
+                    return { black, white }
+                },
+
+                status() {
+                    if (this.validPos.length > 0) {
+                        return game.turn === 'b' ? 'black turn' : 'white turn'
+                    } else {
+                        const { black, white } = this.scores
+                        if (black === white) return 'tie'
+                        return black > white ? 'black win' : 'white win'
+                    }
                 }
             }
         })
     </script>
 </body>
+
 </html>
